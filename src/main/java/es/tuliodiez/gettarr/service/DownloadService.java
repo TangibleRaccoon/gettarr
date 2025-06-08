@@ -41,6 +41,8 @@ public class DownloadService {
 
         // make the registry map the URL to an ID and search for it in the temp folder.
         final String fileId = downloadRegistry.getOrRegister(url);
+        if (fileId == null)
+            return new DownloadResult(false, "SERVER ERROR: fileId was null ", "");
         final Path filePath = TEMP_FOLDER.resolve(fileId);
 
         // If the file already exists, update status (just in case) and return.

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -24,6 +25,7 @@ public class DownloadRegistry {
     private static final System.Logger LOGGER = System.getLogger("DownloadRegistry");
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Path FILE_PATH = Path.of("/data/registry.json");
+    private static final Random RANDOM = new Random();
     private final ConcurrentHashMap<String, String> linkToFilename = new ConcurrentHashMap<>();
     private final AtomicLong counter = new AtomicLong(0);
 
@@ -32,21 +34,24 @@ public class DownloadRegistry {
      */
     public String getOrRegister(String url) {
         //todo: get file format from user.
-        //todo: use randomID instead of incremental.
-        if (!linkToFilename.containsKey(url)) {// if the file already exists, we just get the next index
-            String filename = "gettarr_" + counter.incrementAndGet() + ".mp4";
-            LOGGER.log(System.Logger.Level.INFO, "Trying name "+filename+" for URL: "+url);
-            while (Files.exists(Path.of(DownloadService.TEMP_FOLDER + "/" + filename))) {
-                LOGGER.log(System.Logger.Level.INFO, filename+" already exists.");
-                filename = "gettarr_" + counter.incrementAndGet() + ".mp4";
-            }
-            LOGGER.log(System.Logger.Level.INFO, "Settled on "+filename+" for URL: "+url);
-            linkToFilename.putIfAbsent(url, filename);
-            return filename;
-        } else {
+        if (linkToFilename.containsKey(url)) {
             return linkToFilename.get(url);
         }
+        // if we haven't downloaded the URL, we get a new ID
+        String filename = "gettarr_" + counter.getAndSet(RANDOM.nextLong()) + ".mp4";
+        LOGGER.log(System.Logger.Level.INFO, "Trying name "+filename+" for URL: "+url);
+
+        // if the filename is in the map or the downloads folder, look for another one.
+        while (Files.exists(Path.of(DownloadService.TEMP_FOLDER + "/" + filename)) || linkToFilename.containsValue(filename)) {
+            LOGGER.log(System.Logger.Level.INFO, filename+" already exists.");
+            filename = "gettarr_" + counter.getAndSet(RANDOM.nextLong()) + ".mp4";
+        }
+
+        LOGGER.log(System.Logger.Level.INFO, "Settled on "+filename+" for URL: "+url);
+        linkToFilename.putIfAbsent(url, filename);
+        return filename;
     }
+
     @PostConstruct
     public void readFromFile() {
         if (Files.exists(FILE_PATH)) {
