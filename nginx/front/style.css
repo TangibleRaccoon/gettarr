@@ -1,0 +1,254 @@
+:root {
+  --background-color: #000000;
+  --header-color: #FFFFFF;
+  --text-color: #e0e0e0;
+  --content-color: #bbbbbb;
+  --content-header-color: #e7e7e7;
+  --content-bg: #171717;
+  --header-bg: #131313;
+  --main-bg: #1e1e1e;
+  --status-bg: #007D3E;
+  --input-submit-bg: #3a3a3a;
+  --input-submit-hover-bg: #575757;
+  --shadow-color: rgba(120, 120, 120, 0.7);
+  --input-box-shadow: rgba(200, 150, 255, 0.7);
+  --input-submit-box-shadow-hover: rgba(0, 255, 55, 0.7);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+header {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--header-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+header img {
+  height: 50px;
+  margin-right: 1rem;
+}
+
+header h1 {
+  font-size: 2.3rem;
+  font-weight: 300;
+  color: var(--header-color)
+}
+
+main {
+  width: 80%;
+  padding: 2rem;
+  background-color: var(--main-bg);
+  border-radius: 10px;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 10px var(--shadow-color);
+  max-width: 1000px;
+  margin: 1rem;
+}
+
+#statusDisplay {
+  width: calc(100% - 1rem);
+  max-width: 100%;
+  min-height: 50px;
+  margin: 0.5rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  display: none;
+}
+
+.state-ok {
+  border: 2px solid green;
+  background-color: #d0f0d0;
+  color: black;
+}
+
+.state-error {
+  border: 2px solid red;
+  background-color: #f0d0d0;
+  color: black;
+}
+
+.state-checking {
+  border: 2px solid yellow;
+  background-color: #fff8d0;
+  color: black;
+}
+
+.main-container {
+  min-width: 80%;
+}
+
+.main-container h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+#downloadForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+#downloadForm input[type="text"] {
+  padding: 0.8rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.3rem;
+}
+
+#downloadForm input[type="text"]:focus {
+  outline: none;
+  box-shadow: 0 0 20px var(--input-box-shadow);
+  transition: box-shadow 0.4s ease-in-out;
+}
+
+#downloadForm input[type="submit"] {
+  padding: 0.8rem;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--input-submit-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  font-size: 1.5rem;
+}
+
+#downloadForm input[type="submit"]:hover {
+  background-color: var(--input-submit-hover-bg);
+  box-shadow: 0 0 20px var(--input-submit-box-shadow-hover);
+  font-weight: bolder;
+  transition: box-shadow 0.4s ease-in-out;
+}
+
+.error-section {
+  width: 80%;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: var(--content-bg);
+  color: var(--content-color);
+  border-radius: 10px;
+  box-shadow: 0 0 10px var(--shadow-color);
+  line-height: 1.6;
+  font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+@keyframes chroma-text {
+  0%   { color: hsl(0, 100%, 50%); }
+  25%  { color: hsl(90, 100%, 50%); }
+  50%  { color: hsl(180, 100%, 50%); }
+  75%  { color: hsl(270, 100%, 50%); }
+  100% { color: hsl(360, 100%, 50%); }
+}
+
+.error-section a, .error-section a:visited {
+  animation: chroma-text 3s infinite linear;
+}
+
+
+.content-section {
+  width: 60%;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: var(--content-bg);
+  color: var(--content-color);
+  border-radius: 10px;
+  box-shadow: 0 0 10px var(--shadow-color);
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.content-section h2 {
+  color: var(--content-header-color);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.content-section p,
+.content-section ul {
+  margin-bottom: 1rem;
+}
+
+.content-section ul {
+  padding-left: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 2rem;
+  }
+  
+  header img {
+    height: 30px;
+  }
+  
+  main {
+    min-width: 90%;
+    max-width: 100%;
+  }
+
+  .main-container {
+    min-width: 90%;
+  }
+
+  .main-container h2 {
+    font-size: 1.5rem;
+  }
+  
+  #downloadForm input[type="text"],
+  #downloadForm input[type="submit"] {
+    font-size: 1.3rem;
+    padding: 1.2rem;
+  }
+
+  #downloadForm input[type="submit"] {
+    font-size: 2rem;
+    padding: 1.2rem;
+  }
+  .content-section {
+    width: 80%;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+footer {
+  width: 100%;
+  padding: 1rem;
+  text-align: center;
+  background-color: var(--header-bg);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}

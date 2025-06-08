@@ -1,0 +1,31 @@
+services:
+  getarr:
+    build:
+      context: .
+      dockerfile: ./DOCKERFILE_SPRING
+    container_name: gettarr
+    restart: no
+    ports: 
+      - 5000:5000
+    volumes:
+      - shared:/tmp/media
+
+  nginx:
+    image: nginx:latest
+    container_name: gettarr-media
+    restart: no
+    volumes:
+      - shared:/tmp/media:ro
+      - ./nginx/front:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - 8080:80
+      - 4433:443
+
+volumes:
+  shared:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./nginx/media
+      o: bind

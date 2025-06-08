@@ -1,0 +1,46 @@
+# Build stage
+FROM gradle:jdk24-alpine AS build_image
+
+WORKDIR /usr/app
+
+COPY build.gradle settings.gradle /usr/app/
+RUN gradle --parallel --no-daemon --refresh-dependencies dependencies
+
+# Now copy source code
+COPY src /usr/app/src
+# Build the application
+RUN gradle --parallel --no-daemon clean build
+
+# Package stage
+FROM amazoncorretto:24-alpine-jdk
+
+WORKDIR /usr/app
+
+# Copy the built jar
+COPY --from=build_image /usr/app/build/libs/gettarr-0.jar .
+
+# Install Python and ffmpeg
+RUN apk add --no-cache python3 ffmpeg && ln -sf python3 /usr/bin/python
+
+# Create a virtual environment so that we can use pip.
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy local dependency files (if available)
+COPY deps/* /usr/local/bin/
+
+# If USE_LOCAL_DEPS is set to false or if yt-dlp doesn't exist, install dependencies via pip.
+ARG USE_LOCAL_DEPS=auto
+RUN if [ "$USE_LOCAL_DEPS" = "false" ]; then \
+      rm -f /usr/local/bin/yt-dlp /usr/local/bin/gallery-dl; \
+      echo "USE_LOCAL_DEPS set to false or local dependencies missing: Installing via pip."; \
+      pip install -U yt-dlp; \
+elif [ -f /usr/local/bin/yt-dlp ]; then \
+      echo "Local dependencies found! No dependencies will be installed"; \
+      chmod +x /usr/local/bin/yt-dlp; \
+else \
+      echo "No local dependencies found; installing via pip."; \
+      pip install -U yt-dlp; \
+fi
+
+ENTRYPOINT ["java", "-jar", "gettarr-0.jar"]

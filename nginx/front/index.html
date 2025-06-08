@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <title>Gettarr</title>
+    <link rel="shortcut icon" href="img/icon.ico" />
+  </head>
+  <body>
+    <header>
+      <img src="img/getarr.svg" alt="Gettarr Logo" />
+      <h1 title="Your favorite media downloader">Gettarr</h1>
+    </header>
+
+    <main>
+      <section id="downloadSection" class="main-container">
+        <h2>Get your media now:</h2>
+        <div id="downloadBox">
+          <form id="downloadForm">
+            <input
+              id="urlInput"
+              type="text"
+              placeholder="Link to download here..."
+            />
+            <input type="submit" value="Download" />
+          </form>
+          <div id="statusDisplay">
+            <p>Your request is being processed at the moment</p>
+            <p>Please wait patiently</p>
+          </div>
+        </div>
+      </section>
+      </main>   
+      <!-- Overview Section -->
+      <section class="content-section">
+        <h2>What is Gettarr?</h2>
+        <p>
+          Gettarr is a self-hosted, open-source media downloader that provides a
+          configurable, ad-free way to download and manage media content. With
+          Gettarr, you can download your favorite media files and share them
+          directly, ensuring that the content remains accessible even if it's later
+          removed, moved, or updated on social media platforms.
+        </p>
+      </section>
+
+      <!-- Features Section -->
+      <section class="content-section">
+        <h2>Features</h2>
+        <ul>
+          <li><strong>Media Ownership:</strong> Download and archive your favorite media files directly.</li>
+          <li>
+            <strong>Easy Sharing:</strong> Share files with friends without relying on external platforms.
+          </li>
+          <li>
+            <strong>Content Preservation:</strong> Keep a personal archive of the media you love.
+          </li>
+          <li>
+            <strong>Wide Compatibility:</strong> Built on yt-dlp (and soon gallery-dl) for downloads from many sources.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Disclaimer Section -->
+      <section class="content-section">
+        <h2>Disclaimer</h2>
+        <p>
+          Gettarr is provided as-is for personal use only. It is not intended to facilitate activities that violate any website's terms of service or applicable legislation. Use it at your own risk. 
+          For more details, please review the usage guidelines in our documentation.
+        </p>
+      </section>
+
+      <!-- License Section -->
+      <section class="content-section">
+        <h2>License</h2>
+        <p>
+          Gettarr is currently provisionally licensed under the chosen license for development and testing purposes. 
+          Note that third-party components such as yt-dlp, gallery-dl, and Spring Boot have their own licenses. 
+          Please use this project at your own risk.
+        </p>
+      </section>
+
+    <footer>
+      <p>2025 Gettarr Project.</p>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>
