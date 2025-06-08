@@ -1,8 +1,16 @@
 package es.tuliodiez.gettarr.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.tuliodiez.gettarr.service.DownloadService;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +22,8 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class DownloadRegistry {
     private static final System.Logger LOGGER = System.getLogger("DownloadRegistry");
-    // todo: save and load registry from file.
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Path FILE_PATH = Path.of("/data/registry.json");
     private final ConcurrentHashMap<String, String> linkToFilename = new ConcurrentHashMap<>();
     private final AtomicLong counter = new AtomicLong(0);
 
@@ -36,6 +45,41 @@ public class DownloadRegistry {
             return filename;
         } else {
             return linkToFilename.get(url);
+        }
+    }
+    @PostConstruct
+    public void readFromFile() {
+        if (Files.exists(FILE_PATH)) {
+            try (BufferedReader reader = Files.newBufferedReader(FILE_PATH)) {
+                ConcurrentHashMap<String, String> loadedMap = objectMapper.readValue(reader, new TypeReference<ConcurrentHashMap<String, String>>() {});
+                linkToFilename.putAll(loadedMap);
+                String anyKey = linkToFilename.keys().hasMoreElements() ? linkToFilename.keys().nextElement() : "none";
+                LOGGER.log(System.Logger.Level.INFO, "Loaded file from " + FILE_PATH + ". Last key-val: " + linkToFilename.get(anyKey));
+            } catch (JsonProcessingException e) {
+                LOGGER.log(System.Logger.Level.ERROR, "ERROR when reading from " + FILE_PATH + ": " + e.getMessage());
+            } catch (IOException e) {
+                LOGGER.log(System.Logger.Level.ERROR, "I/O Exception when reading from " + FILE_PATH + ": " + e.getMessage());
+            }
+        } else {
+            LOGGER.log(System.Logger.Level.WARNING, "Tried reading from " + FILE_PATH + " but no file was found, creating file.");
+        }
+    }
+
+
+    @PreDestroy
+    public void writeToFile() {
+        if (Files.isDirectory(Path.of("/data"))) {
+            LOGGER.log(System.Logger.Level.ERROR, "Folder /data doesn't exist, can't write registry to file.");
+        }
+        try {
+            try {
+                Files.createFile(FILE_PATH);
+            // Keep going if file already exists
+            } catch (FileAlreadyExistsException _) {}
+            objectMapper.writeValue(Files.newBufferedWriter(FILE_PATH), linkToFilename);
+
+        } catch (IOException e) {
+           LOGGER.log(System.Logger.Level.ERROR, "I/O Exception when writing to /data/registry.json");
         }
     }
 }
