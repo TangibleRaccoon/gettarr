@@ -4,20 +4,17 @@ FROM gradle:jdk24-alpine AS build_image
 WORKDIR /usr/app
 
 COPY build.gradle settings.gradle /usr/app/
-RUN gradle --parallel --no-daemon --refresh-dependencies dependencies
+RUN gradle --parallel --refresh-dependencies dependencies
 
 # Now copy source code
 COPY src /usr/app/src
 # Build the application
-RUN gradle --parallel --no-daemon clean build
+RUN gradle --parallel clean build
 
 # Package stage
 FROM amazoncorretto:24-alpine-jdk
 
 WORKDIR /usr/app
-
-# Copy the built jar
-COPY --from=build_image /usr/app/build/libs/gettarr-0.jar .
 
 # Install Python and ffmpeg
 RUN apk add --no-cache python3 ffmpeg && ln -sf python3 /usr/bin/python
@@ -42,5 +39,10 @@ else \
       echo "No local dependencies found; installing via pip."; \
       pip install -U yt-dlp; \
 fi
+
+
+# Copy the built jar
+COPY --from=build_image /usr/app/build/libs/gettarr-0.jar .
+
 
 ENTRYPOINT ["java", "-jar", "gettarr-0.jar"]
