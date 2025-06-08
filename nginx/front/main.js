@@ -9,16 +9,17 @@ class GettarrResponse {
     }
 }
 
-const checkInterval = 2000 // Interval to check if the content has been downloaded
+const checkInterval = 500 // Interval to check if the content has been downloaded
 const display = document.getElementById("statusDisplay")
-const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '')
-const endpointUrl = window.location.protocol + "//" + window.location.hostname + ':5000'
+const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "")
+const endpointUrl = window.location.protocol + "//" + window.location.hostname + ":5000"
+const urlInput = document.getElementById("urlInput")
 
 // download request function using async/await
 async function requestDownload(queryUrl) {
     const response = await fetch(endpointUrl+"/dw", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ inputUrl: queryUrl })
     })
     
@@ -32,7 +33,7 @@ async function checkDownloadStatus(fileId) {
         try {
             const res = await fetch(`${endpointUrl}/dw/status/${fileId}`)
             const json = await res.json()
-            console.log("Current status: " + json.status+ "body "+json.body)
+            console.log("Current status: " + json.status+ " body: "+json.body)
             showStatus(json.status, json.body)
             if (json.status === "DOWNLOADING")
                 showStatus("DOWNLOADING", "Your file "+json.body+" is being downloaded, please hold")
@@ -52,7 +53,9 @@ function showStatus(code, body) {
     switch (code) {
         case "COMPLETED":
             display.classList.add("state-ok")
-            display.innerHTML = `<p>Your file has been downloaded successfully:</p><br><a href="${baseUrl}/media/${body}">${body}</a>`
+            display.innerHTML = `<p>Your file has been downloaded successfully:</p><br><a href="${baseUrl}/media/${body}">Preview</a> <br>`
+            display.innerHTML += `<a href="${baseUrl}/media/${body}?download=1">Direct Download</a>`
+            urlInput.value = ""
             break
         case "DOWNLOADING":
             display.classList.add("state-checking")
@@ -73,9 +76,9 @@ function clearDisplay() {
 
 
 // Event handler for the download form
-document.getElementById('downloadForm').addEventListener('submit', async function(e) {
+document.getElementById("downloadForm").addEventListener("submit", async function(e) {
     e.preventDefault()
-    const queryUrl = e.target.urlInput.value
+    const queryUrl = e.target.urlInput.value.trim()
     console.log("Submitting -> " + queryUrl)
     const response = await requestDownload(queryUrl)
 
