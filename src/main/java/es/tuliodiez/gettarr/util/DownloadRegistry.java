@@ -56,7 +56,8 @@ public class DownloadRegistry {
     public void readFromFile() {
         if (Files.exists(FILE_PATH)) {
             try (BufferedReader reader = Files.newBufferedReader(FILE_PATH)) {
-                ConcurrentHashMap<String, String> loadedMap = objectMapper.readValue(reader, new TypeReference<ConcurrentHashMap<String, String>>() {});
+                ConcurrentHashMap<String, String> loadedMap = objectMapper.readValue(reader, new TypeReference<>() {
+                });
                 linkToFilename.putAll(loadedMap);
                 String anyKey = linkToFilename.keys().hasMoreElements() ? linkToFilename.keys().nextElement() : "none";
                 LOGGER.log(System.Logger.Level.INFO, "Loaded file from " + FILE_PATH + ". Last key-val: " + linkToFilename.get(anyKey));

@@ -1,11 +1,9 @@
 package es.tuliodiez.gettarr.service;
 
 import es.tuliodiez.gettarr.model.DownloadResult;
-import es.tuliodiez.gettarr.model.GettarrResponse;
 import es.tuliodiez.gettarr.util.DownloadRegistry;
 import es.tuliodiez.gettarr.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
