@@ -1,7 +1,6 @@
 # Gettarr
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-<!-- Consider adding additional badges such as build status, version, etc. -->
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Gettarr is a self-hosted, open-source media downloader that provides a configurable, ad-free way to download and manage media content. With Gettarr, you can download your favorite media files and share them directly, ensuring that the content remains accessible even if it’s later removed, moved, or updated on social media platforms.
 
@@ -12,7 +11,7 @@ The primary goal of Gettarr is to simplify media consumption:
 - **Easy Sharing:** Share files with friends without requiring them to access social media.
 - **Content Preservation:** Keep a personal archive of the media content you love.
 
-Gettarr wraps around [yt-dlp](https://github.com/yt-dlp/yt-dlp) (and soon, [gallery-dl](https://github.com/mikf/gallery-dl)), supporting downloads from a wide range of websites.
+Gettarr wraps around [yt-dlp](https://github.com/yt-dlp/yt-dlp) , supporting downloads from a wide range of websites.
 
 ## Disclaimer
 
@@ -36,21 +35,18 @@ Usage
 -->
 
 ## License
-### WIP
+ 
+
 # Provisional License Notice
 
-This project is a work in progress (WIP) and is provisionally licensed under the **[Your Chosen License, e.g., MIT License]** for the purpose of development and testing.
-
+This project is a work in progress (WIP) and licensed under the GNU General Public License, Version 3 (GPLv3) 
 **Please note:**
 
-- This provisional license does not extend to third-party components included in this project.
+- This license does not extend to third-party components which may be included in this project.
 - `yt-dlp` is licensed under the **Unlicense**.
 - `gallery-dl` is licensed under **GNU GPL 2.0**.
 - `Spring Boot` is licensed under **Apache License 2.0**.
 
 You must comply with the terms of these licenses when using or redistributing this software.
 
-The final licensing of this project is yet to be determined and may change.
 ### Use this project at your own risk.
-
-> *This notice is provided as a temporary measure during the development stage. A definitive license, which reconciles third-party requirements and final project decisions, will be established prior to any major public release.*
