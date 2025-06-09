@@ -20,11 +20,13 @@ public class DownloadService {
 
     private final DownloadRegistry downloadRegistry;
     private final DownloadStatusTracker downloadStatusTracker;
+    private final ProcessBuilderManager pbManager;
 
     @Autowired
-    public DownloadService(DownloadRegistry downloadRegistry, DownloadStatusTracker downloadStatusTracker) {
+    public DownloadService(DownloadRegistry downloadRegistry, DownloadStatusTracker downloadStatusTracker, ProcessBuilderManager pbManager) {
         this.downloadRegistry = downloadRegistry;
         this.downloadStatusTracker = downloadStatusTracker;
+        this.pbManager = pbManager;
     }
 
     public DownloadResult download(String url) {
@@ -53,16 +55,8 @@ public class DownloadService {
         // we set the status as downloading
         downloadStatusTracker.updateStatus(fileId, "DOWNLOADING");
 
-        // todo: get builder dynamically
         // Builder for yt-dlp process
-        ProcessBuilder pb = new ProcessBuilder(
-                "yt-dlp",
-                "-f", "bv+ba",                        // Best video + best audio (merged)
-                "--merge-output-format", "mp4",       // Ensure MP4 format
-                "-o", filePath.toString(),            // Output filename
-                url                                   // Url to download
-        );
-        pb.inheritIO();
+        final ProcessBuilder pb = pbManager.getBestAudioBestVideo(url, filePath).inheritIO();
 
         // send the download task to the executor and send response to client
         executor.submit(new DownloadTask(pb, url, filePath, fileId, downloadStatusTracker));
@@ -70,8 +64,8 @@ public class DownloadService {
     }
 
     /*
-    Represent download task, this way we can use different ProcessBuilders for different URLs
-    This task updates the download status directly
+        Represent download task, this way we can use different ProcessBuilders for different URLs
+        This task updates the download status directly
      */
     private record DownloadTask(ProcessBuilder pb, String url, Path filePath, String fileId,
                                 DownloadStatusTracker tracker) implements Runnable {

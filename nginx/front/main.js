@@ -1,5 +1,5 @@
 class GettarrResponse {
-    constructor(status, body, data) {
+    constructor(status, body) {
         this.status = status
         this.body = body
     }
@@ -9,13 +9,33 @@ class GettarrResponse {
     }
 }
 
+class GettarrInfo {
+    constructor(title, thumbnail) {
+        this.title = title
+        this.thumbnail = thumbnail
+    }
+
+    static fromJson(json) {
+        return new GettarrInfo(json.title, json.thumbnail)
+    }
+}
+
+const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "")
+const endpointPort = "5000"
+const endpointUrl = window.location.protocol + "//" + window.location.hostname + ":" + endpointPort
+
+
 const checkInterval = 500 // Interval to check if the content has been downloaded
 const display = document.getElementById("statusDisplay")
-const spinner = document.createElement("div")
-spinner.id = "spinner"
-const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "")
-const endpointUrl = window.location.protocol + "//" + window.location.hostname + ":5000"
+const displayBody = document.getElementById("statusDisplayBody")
+const videoInfoDisplay = document.getElementById("videoInfo")
 const urlInput = document.getElementById("urlInput")
+const spinner = document.createElement("div");
+spinner.id = "spinner";
+spinner.classList.add("spinner"); 
+
+let debounceTimer = null
+const debounceInterval = 1000 // Time (in ms) to wait after user input stops to check for video info
 
 // download request function using async/await
 async function requestDownload(queryUrl) {
@@ -28,7 +48,6 @@ async function requestDownload(queryUrl) {
     const json = await response.json()
     return GettarrResponse.fromJson(json)
 }
-
 
 async function checkDownloadStatus(fileId) {
     const interval = setInterval(async () => {
@@ -49,13 +68,46 @@ async function checkDownloadStatus(fileId) {
     }, checkInterval) 
 }
 
+async function requestInfo(queryUrl) {
+    console.log("request info for: "+queryUrl)
+    const response = await fetch(endpointUrl+"/info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inputUrl: queryUrl })
+    })
+    
+    const json = await response.json()
+    return GettarrInfo.fromJson(json)
+}
+
+async function displayVideoInfo(videoData) {
+    videoInfoDisplay.innerHTML = "";
+    videoInfoDisplay.classList.add("video-card");
+    
+    // Create a title element
+    const titleEl = document.createElement("h3");
+    titleEl.classList.add("video-title");
+    titleEl.textContent = videoData.title;
+    
+    // Create an image element for the thumbnail
+    const img = document.createElement("img");
+    img.classList.add("video-thumbnail");
+    img.src = videoData.thumbnail;
+    img.alt = videoData.title;
+    
+    // Append children to the card
+    videoInfoDisplay.appendChild(img);
+    videoInfoDisplay.appendChild(titleEl);
+    videoInfoDisplay.style.display = "flex";
+}
+
 function showStatus(code, body) {
     clearDisplay()
     display.style.display = "flex"
     switch (code) {
         case "COMPLETED":
             display.classList.add("state-ok")
-            display.innerHTML = `<p>Your file has been downloaded successfully:</p>
+            displayBody.innerHTML = `<p>Your file has been downloaded successfully:</p>
   <div class="btn-container">
     <a href="${baseUrl}/media/${body}" class="btn">
         <img src="/img/preview.svg" alt="Preview" class="icon"> Preview
@@ -66,24 +118,30 @@ function showStatus(code, body) {
   </div>`
             // display.innerHTML += `<a href="${baseUrl}/media/${body}?download=1">Direct Download</a>`
             urlInput.value = ""
+                display.removeChild(spinner);
             break
         case "DOWNLOADING":
             display.classList.add("state-checking")
-            display.innerText = body
-            display.append(spinner)
+            displayBody.innerText = body
+            if (!document.getElementById("spinner")) { 
+                display.appendChild(spinner);
+            }
             break
         default:
             display.classList.add("state-error")
-            display.innerText = body
+            displayBody.innerText = body
+                display.removeChild(spinner);
             break
     }
 }
 
 function clearDisplay() {
-    display.classList.remove("state-error", "state-ok", "state-checking")
-    display.innerText =""
-    display.style.display = "none"
+    display.classList.remove("state-error", "state-ok", "state-checking");
+    // Clear only the message part so that the spinner remains intact.
+    displayBody.innerHTML = "";
+    display.style.display = "none";
 }
+
 
 
 // Event handler for the download form
@@ -103,4 +161,16 @@ document.getElementById("downloadForm").addEventListener("submit", async functio
     }
 })
 
+document.getElementById("urlInput").addEventListener('input', () => {
+    if (debounceTimer) clearTimeout(debounceTimer);
 
+    debounceTimer = setTimeout(async function() {
+       const response = await requestInfo(urlInput.value);
+       console.log("Got response:", response);
+       if (response && response.title && response.thumbnail) {
+           displayVideoInfo(response);
+       } else {
+           console.error("Incomplete response:", response);
+       }
+    }, debounceInterval);
+});

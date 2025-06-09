@@ -2,10 +2,11 @@ package es.tuliodiez.gettarr.controller;
 
 import es.tuliodiez.gettarr.model.DownloadRequest;
 import es.tuliodiez.gettarr.model.DownloadResult;
+import es.tuliodiez.gettarr.model.GettarrInfo;
 import es.tuliodiez.gettarr.model.GettarrResponse;
 import es.tuliodiez.gettarr.service.DownloadService;
 import es.tuliodiez.gettarr.service.DownloadStatusTracker;
-import es.tuliodiez.gettarr.util.Util;
+import es.tuliodiez.gettarr.service.VideoInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +19,13 @@ public class GettarrController {
     private static final System.Logger LOGGER = System.getLogger("GettarrController");
 
     private final DownloadService downloadService;
+    private final VideoInfoService infoService;
     private final DownloadStatusTracker statusTracker;
 
     @Autowired
-    public GettarrController(DownloadService downloadService, DownloadStatusTracker statusTracker) {
+    public GettarrController(DownloadService downloadService, VideoInfoService infoService, DownloadStatusTracker statusTracker) {
         this.downloadService = downloadService;
+        this.infoService = infoService;
         this.statusTracker = statusTracker;
     }
 
@@ -39,6 +42,22 @@ public class GettarrController {
             return ResponseEntity.internalServerError().body(new GettarrResponse("ERROR", dwResult.message()));
         }
     }
+
+    @PostMapping(path = "/info")
+    public ResponseEntity<GettarrInfo> getVideoInfo(@RequestBody DownloadRequest downloadRequest) {
+        final String inputUrl = downloadRequest.inputUrl();
+        // todo: handle errors correctly
+        final GettarrInfo info = infoService.getVideoInfo(inputUrl);
+        if (!info.thumbnail().isBlank() && !info.title().isBlank()) {
+            LOGGER.log(System.Logger.Level.INFO,"returning "+info+" for info request: "+inputUrl);
+            return ResponseEntity.ok().body(info);
+        }
+        else{
+            LOGGER.log(System.Logger.Level.ERROR,"returning no content for info request: "+inputUrl);
+            return ResponseEntity.noContent().build();
+        }
+    }
+
 
     @GetMapping(path = "/dw/status/{fileId}")
     public ResponseEntity<GettarrResponse> getDownloadStatus(@PathVariable String fileId) {
