@@ -205,6 +205,39 @@ main {
   padding-left: 1.5rem;
 }
 
+.btn-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+a.btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1.3rem;
+  text-align: center;
+  background-color: var(--input-submit-bg);
+  color: var(--text-color);
+  transition: background-color 0.2s ease-in-out, box-shadow 0.4s ease-in-out;
+}
+
+a.btn:hover {
+  background-color: var(--input-submit-hover-bg);
+  box-shadow: 0 0 20px var(--input-submit-box-shadow-hover);
+}
+
+.icon {
+  width: 20px; 
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+  filter: invert();
+}
+
 @media (max-width: 600px) {
   header h1 {
     font-size: 2rem;
@@ -241,6 +274,11 @@ main {
     width: 80%;
     padding: 1rem;
     font-size: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
   }
 }
 

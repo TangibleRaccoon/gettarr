@@ -53,8 +53,16 @@ function showStatus(code, body) {
     switch (code) {
         case "COMPLETED":
             display.classList.add("state-ok")
-            display.innerHTML = `<p>Your file has been downloaded successfully:</p><br><a href="${baseUrl}/media/${body}">Preview</a> <br>`
-            display.innerHTML += `<a href="${baseUrl}/media/${body}?download=1">Direct Download</a>`
+            display.innerHTML = `<p>Your file has been downloaded successfully:</p>
+  <div class="btn-container">
+    <a href="${baseUrl}/media/${body}" class="btn">
+        <img src="/img/preview.svg" alt="Preview" class="icon"> Preview
+    </a>
+    <a href="${baseUrl}/media/${body}?download=1" class="btn">
+        <img src="/img/download.svg" alt="Download" class="icon">Direct Download
+    </a>
+  </div>`
+            // display.innerHTML += `<a href="${baseUrl}/media/${body}?download=1">Direct Download</a>`
             urlInput.value = ""
             break
         case "DOWNLOADING":
