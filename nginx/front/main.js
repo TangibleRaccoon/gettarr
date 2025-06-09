@@ -11,6 +11,8 @@ class GettarrResponse {
 
 const checkInterval = 500 // Interval to check if the content has been downloaded
 const display = document.getElementById("statusDisplay")
+const spinner = document.createElement("div")
+spinner.id = "spinner"
 const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "")
 const endpointUrl = window.location.protocol + "//" + window.location.hostname + ":5000"
 const urlInput = document.getElementById("urlInput")
@@ -68,6 +70,7 @@ function showStatus(code, body) {
         case "DOWNLOADING":
             display.classList.add("state-checking")
             display.innerText = body
+            display.append(spinner)
             break
         default:
             display.classList.add("state-error")
@@ -92,7 +95,7 @@ document.getElementById("downloadForm").addEventListener("submit", async functio
 
     if (response.status === "OK" ) {
         console.log("Download initiated. File ID: " + response.body)
-        showStatus("DOWNLOADING", "Your file "+response.body+" is being downloaded, please old")
+        showStatus("DOWNLOADING", "Your file "+response.body+" is being downloaded, please hold")
         checkDownloadStatus(response.body)
     } else {
         console.error("ERROR: " + response)
