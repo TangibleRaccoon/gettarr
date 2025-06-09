@@ -268,15 +268,37 @@ a.btn:hover {
 }
 
 .video-thumbnail {
-  width: 50%;
-  height: 50%;
+  width: 100%;
+  height: auto;
   border-radius: 10px;
 }
 
 .video-title {
-margin-top: 0.5rem;
-font-size: 1.2rem;
-color: #e0e0e0;
+  margin-top: 0.5rem;
+  font-size: 1.2rem;
+  color: #e0e0e0;
+}
+
+.video-thumbnail-container {
+  display: flex;
+  align-items: center; /* Centers items vertically */
+  justify-content: center; /* Centers items horizontally */
+  position: relative;
+  width: 50%;
+}
+
+.video-duration {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent dark background */
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Optional extra shadow */
+  z-index: 2; /* Ensures the duration element is on top */
 }
 
 @media (max-width: 600px) {

@@ -22,7 +22,7 @@ public class ProcessBuilderManager {
                 //yt-dlp --print "%(title)s  %(thumbnail)s" "https://es.pinterest.com/pin/648307308896155710/"
                 "yt-dlp",
                 "--print",
-                "%(title)s @@@SPLITHERE@@@ %(thumbnail)s",
+                "%(title)s @@@SPLITHERE@@@ %(thumbnail)s @@@SPLITHERE@@@ %(duration)s",
                 queryUrl
         );
     }

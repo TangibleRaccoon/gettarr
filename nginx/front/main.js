@@ -10,13 +10,14 @@ class GettarrResponse {
 }
 
 class GettarrInfo {
-    constructor(title, thumbnail) {
+    constructor(title, thumbnail, duration) {
         this.title = title
         this.thumbnail = thumbnail
+        this.duration = duration
     }
 
     static fromJson(json) {
-        return new GettarrInfo(json.title, json.thumbnail)
+        return new GettarrInfo(json.title, json.thumbnail, json.duration)
     }
 }
 
@@ -94,9 +95,20 @@ async function displayVideoInfo(videoData) {
     img.classList.add("video-thumbnail");
     img.src = videoData.thumbnail;
     img.alt = videoData.title;
+    if (videoData.duration) {
+        const thumbnailContainer = document.createElement("div");
+        thumbnailContainer.classList.add("video-thumbnail-container");
+        const durationEl = document.createElement("span");
+        durationEl.classList.add("video-duration");
+        durationEl.textContent = formatTime(videoData.duration);
+        thumbnailContainer.appendChild(img);
+        thumbnailContainer.appendChild(durationEl);
+        videoInfoDisplay.appendChild(thumbnailContainer);
+    } else {
+        videoInfoDisplay.appendChild(img);
+    }
     
     // Append children to the card
-    videoInfoDisplay.appendChild(img);
     videoInfoDisplay.appendChild(titleEl);
     videoInfoDisplay.style.display = "flex";
 }
@@ -142,7 +154,11 @@ function clearDisplay() {
     display.style.display = "none";
 }
 
-
+function formatTime(seconds) {
+    let minutes = Math.floor(seconds / 60);
+    let sec = seconds % 60;
+    return `${minutes}:${sec.toString().padStart(2, '0')}`;
+}
 
 // Event handler for the download form
 document.getElementById("downloadForm").addEventListener("submit", async function(e) {

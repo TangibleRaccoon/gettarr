@@ -23,7 +23,7 @@ public class VideoInfoService {
 
     public GettarrInfo getVideoInfo(String queryUrl) {
         if (queryUrl == null || queryUrl.isBlank() ) {
-            return new GettarrInfo("", "");
+            return new GettarrInfo("", "", "");
         }
 
         final ProcessBuilder pb = pbManager.getTitleAndThumb(queryUrl);
@@ -35,13 +35,13 @@ public class VideoInfoService {
         } catch (ExecutionException | InterruptedException e) {
             LOGGER.log(System.Logger.Level.ERROR, "Execution exception getting info: "+e.getMessage());
         }
-        return new GettarrInfo("", "");
+        return new GettarrInfo("", "", "");
     }
 
     private record InfoTask(ProcessBuilder pb, String queryUrl) implements Callable<GettarrInfo> {
         @Override
         public GettarrInfo call() {
-            String title="", thumbnailURL = "";
+            String title="", thumbnailURL = "", duration = "";
             try {
                 final Process p = pb.start();
                 try (final BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
@@ -51,15 +51,16 @@ public class VideoInfoService {
                     while ((line = br.readLine()) != null) {
                         if (line.isEmpty()) {
                             LOGGER.log(System.Logger.Level.ERROR, "Received empty output.");
-                            return new GettarrInfo("", "");
+                            return new GettarrInfo("", "", "");
                         }
 
                         // Splitting the output
                         final String[] parts = line.split("@@@SPLITHERE@@@");
 
-                        if (parts.length == 2) {
+                        if (parts.length == 3) {
                             title = parts[0];
                             thumbnailURL = parts[1];
+                            duration = parts[2];
 
                             LOGGER.log(System.Logger.Level.INFO, "Got title: " + title + " and url: " + thumbnailURL + " for query: " + queryUrl);
                         } else {
@@ -71,14 +72,14 @@ public class VideoInfoService {
                     if (code != 0)
                         LOGGER.log(System.Logger.Level.INFO, "Info Process finished with error code: " + code);
 
-                    return new GettarrInfo(title, thumbnailURL);
+                    return new GettarrInfo(title, thumbnailURL, duration);
                 } catch (InterruptedException e) {
                     LOGGER.log(System.Logger.Level.INFO, "Info Process interrupt.");
                 }
             } catch (IOException e) {
                 LOGGER.log( System.Logger.Level.ERROR,"I/O exception: "+e.getMessage());
             }
-            return new GettarrInfo("", "");
+            return new GettarrInfo("", "", "");
         }
     }
 }
