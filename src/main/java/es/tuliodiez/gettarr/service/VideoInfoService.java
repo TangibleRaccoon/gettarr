@@ -1,6 +1,7 @@
 package es.tuliodiez.gettarr.service;
 
 import es.tuliodiez.gettarr.model.GettarrInfo;
+import es.tuliodiez.gettarr.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ public class VideoInfoService {
     }
 
     public GettarrInfo getVideoInfo(String queryUrl) {
-        if (queryUrl == null || queryUrl.isBlank() ) {
+        if (queryUrl == null || queryUrl.isBlank() || !Util.isValidUrl(queryUrl) ) {
             return new GettarrInfo("", "", "");
         }
 
