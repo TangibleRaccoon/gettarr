@@ -27,7 +27,7 @@ public class DownloadRegistry {
     private static final Path FILE_PATH = Path.of("/data/registry.json");
     private static final Random RANDOM = new Random();
     private final ConcurrentHashMap<String, String> linkToFilename = new ConcurrentHashMap<>();
-    private final AtomicLong counter = new AtomicLong(0);
+    private final AtomicLong counter = new AtomicLong(RANDOM.nextLong());
 
     /**
      * Returns filename for given url, if it doesn't exist, it creates a new one and saves it

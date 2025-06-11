@@ -22,8 +22,7 @@ class GettarrInfo {
 }
 
 const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port : "")
-const endpointPort = "5000"
-const endpointUrl = window.location.protocol + "//" + window.location.hostname + ":" + endpointPort
+const endpointUrl = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + "/api"
 
 
 const checkInterval = 500 // Interval to check if the content has been downloaded
