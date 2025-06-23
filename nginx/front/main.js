@@ -80,6 +80,22 @@ async function requestInfo(queryUrl) {
     return GettarrInfo.fromJson(json)
 }
 
+
+const videoQualityValues = ["144p","240p","360p","480p","720p","1080p","1440p","2160p"];
+const audioQualityValues = ["64 kbps","128 kbps","192 kbps","256 kbps","320 kbps"];
+
+const vSlider = document.getElementById("videoQualitySlider");
+const vLabel  = document.getElementById("videoQualityLabel");
+vSlider.addEventListener("input", () => {
+vLabel.textContent = videoQualityValues[vSlider.value];
+});
+
+const aSlider = document.getElementById("audioQualitySlider");
+const aLabel  = document.getElementById("audioQualityLabel");
+aSlider.addEventListener("input", () => {
+aLabel.textContent = audioQualityValues[aSlider.value];
+});
+
 async function displayVideoInfo(videoData) {
     videoInfoDisplay.innerHTML = "";
     videoInfoDisplay.classList.add("video-card");
