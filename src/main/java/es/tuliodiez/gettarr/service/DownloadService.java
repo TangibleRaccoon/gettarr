@@ -1,5 +1,6 @@
 package es.tuliodiez.gettarr.service;
 
+import es.tuliodiez.gettarr.model.DownloadRequest;
 import es.tuliodiez.gettarr.model.DownloadResult;
 import es.tuliodiez.gettarr.util.DownloadRegistry;
 import es.tuliodiez.gettarr.util.Util;
@@ -29,6 +30,37 @@ public class DownloadService {
         this.pbManager = pbManager;
     }
 
+    /**
+     * Download method taking in DownloadRequest directly, downloads with given format if avaliable
+     */
+    public DownloadResult download(DownloadRequest request) {
+
+        if (!Util.isCompleteRequest(request)){
+            LOGGER.log(System.Logger.Level.WARNING, "Got incomplete request, getting best audio and video as fallback.");
+            return download(request.inputUrl());
+        }
+
+        // Get the filename with given quality
+        final String filename = downloadRegistry.getOrRegister(request, TEMP_FOLDER);
+        final Path filePath = TEMP_FOLDER.resolve(filename);
+
+        // if the file already exists, return it
+        if (Files.exists(filePath)) {
+            downloadStatusTracker.updateStatus(filename, "COMPLETED");
+            return new DownloadResult(true, "COMPLETED", filename);
+        }
+
+        // the file doesn't exist, download it
+        downloadStatusTracker.updateStatus(filename, "DOWNLOADING");
+        ProcessBuilder pb = ProcessBuilderManager.getVideoFromRequest(request, filePath).inheritIO();
+
+        executor.submit(new DownloadTask(pb, filePath, filename, downloadStatusTracker));
+        return new DownloadResult(true, "DOWNLOADING", filename);
+    }
+
+    /**
+     * Basic download method, uses the best Audio and Video quality
+     */
     public DownloadResult download(String url) {
         if (url == null || url.isBlank() ) {
             LOGGER.log(System.Logger.Level.ERROR, "Provided URL \""+url+"\"  is null or empty.");
@@ -59,7 +91,7 @@ public class DownloadService {
         final ProcessBuilder pb = pbManager.getBestAudioBestVideo(url, filePath).inheritIO();
 
         // send the download task to the executor and send response to client
-        executor.submit(new DownloadTask(pb, url, filePath, fileId, downloadStatusTracker));
+        executor.submit(new DownloadTask(pb, filePath, fileId, downloadStatusTracker));
         return new DownloadResult(true, "DOWNLOADING", filePath.getFileName().toString());
     }
 
@@ -67,12 +99,11 @@ public class DownloadService {
         Represent download task, this way we can use different ProcessBuilders for different URLs
         This task updates the download status directly
      */
-    private record DownloadTask(ProcessBuilder pb, String url, Path filePath, String fileId,
+    private record DownloadTask(ProcessBuilder pb, Path filePath, String fileId,
                                 DownloadStatusTracker tracker) implements Runnable {
 
     @Override
         public void run() {
-            LOGGER.log(System.Logger.Level.INFO, "Starting download process for URL: " + url);
             try {
                 Process process = pb.start();
                 int exitCode = process.waitFor();

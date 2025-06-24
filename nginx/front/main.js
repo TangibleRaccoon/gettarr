@@ -42,7 +42,7 @@ async function requestDownload(queryUrl) {
     const response = await fetch(endpointUrl + "/dw", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inputUrl: queryUrl })
+        body: JSON.stringify({ inputUrl: queryUrl, vidQuality: videoQualityValues[vSlider.value], audioQuality: audioQualityValues[aSlider.value]})
     })
 
     const json = await response.json()
@@ -82,7 +82,7 @@ async function requestInfo(queryUrl) {
 
 
 const videoQualityValues = ["144p","240p","360p","480p","720p","1080p","1440p","2160p"];
-const audioQualityValues = ["64 kbps","128 kbps","192 kbps","256 kbps","320 kbps"];
+const audioQualityValues = ["64kbps","128kbps","192kbps","256kbps","320kbps"];
 
 const vSlider = document.getElementById("videoQualitySlider");
 const vLabel  = document.getElementById("videoQualityLabel");

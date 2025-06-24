@@ -3,6 +3,7 @@ package es.tuliodiez.gettarr.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.tuliodiez.gettarr.model.DownloadRequest;
 import es.tuliodiez.gettarr.service.DownloadService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -30,7 +31,32 @@ public class DownloadRegistry {
     private final AtomicLong counter = new AtomicLong(RANDOM.nextLong());
 
     /**
-     * Returns filename for given url, if it doesn't exist, it creates a new one and saves it
+     * Resolves filename for a given download request in a folder
+     */
+    public String getOrRegister(DownloadRequest request, Path folder) {
+        String key = request.inputUrl() + "::" + request.vidQuality() + "::" + request.audioQuality();
+        if (linkToFilename.containsKey(key)) {
+            return linkToFilename.get(key);
+        }
+
+        final String qString = Util.getQualityString(request);
+        String filename = "gettarr_" + counter.getAndSet(RANDOM.nextLong()) + qString + ".mp4";
+
+        // if the filename is in the map or the downloads folder, look for another one.
+        while (Files.exists(Path.of(folder + "/" + filename))
+                || linkToFilename.containsValue(filename)) {
+            LOGGER.log(System.Logger.Level.INFO, filename+" already exists.");
+            filename = "gettarr_" + counter.getAndSet(RANDOM.nextLong()) + qString + ".mp4";
+        }
+
+        LOGGER.log(System.Logger.Level.INFO, "Settled on "+filename+" for URL: "+request.inputUrl()+" with format: "+qString);
+        linkToFilename.put(key, filename);
+        return filename;
+    }
+
+
+    /**
+     * Returns default filename for given url, if it doesn't exist, it creates a new one and saves it
      */
     public String getOrRegister(String url) {
         //todo: get file format from user.

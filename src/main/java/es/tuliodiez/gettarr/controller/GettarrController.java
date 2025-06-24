@@ -31,9 +31,7 @@ public class GettarrController {
 
     @PostMapping(path = "/dw")
     public ResponseEntity<GettarrResponse> downloadVideo(@RequestBody DownloadRequest downloadRequest) {
-        final String inputUrl = downloadRequest.inputUrl();
-
-        final DownloadResult dwResult = downloadService.download(inputUrl);
+        final DownloadResult dwResult = downloadService.download(downloadRequest);
         if (dwResult.success()){
             return ResponseEntity.ok(new GettarrResponse("OK", dwResult.filePath()));
         } else if (dwResult.message().contains("BAD_REQUEST")) {
