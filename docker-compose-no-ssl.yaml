@@ -1,0 +1,57 @@
+services:
+  gettarr:
+    build:
+      context: .
+      dockerfile: ./DOCKERFILE_SPRING
+    container_name: gettarr
+    restart: no
+    expose: 
+      - "5000"
+    volumes:
+      - shared:/tmp/media
+      - ./data:/data:rw
+    networks:
+        - internal
+
+  gettarr-front:
+    image: nginx:latest
+    container_name: gettarr-front
+    restart: no
+    volumes:
+      - shared:/tmp/media:ro
+      - ./nginx/front:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    expose:
+      - "80"
+      # - 8080:80
+      # - 4433:443
+    networks:
+      - internal
+
+  gettarr-proxy:
+    image: nginx:alpine
+    container_name: gettarr-proxy
+    depends_on:
+      - gettarr
+      - gettarr-front
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./nginx/proxy/proxy-no-ssl.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:  
+      - "42000:80"
+    networks:
+      - internal
+      
+networks:
+  internal:
+    driver: bridge  
+      
+volumes:
+  shared:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./nginx/media
+      o: bind
+
